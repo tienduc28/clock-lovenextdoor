@@ -1,78 +1,114 @@
-import tkinter as tk
-import time
-import math
+import pygame
+from math import pi, cos, sin
+import datetime
+from pygame import gfxdraw
 
-class Clock:
-    def __init__(self, master):
-        self.master = master
-        master.title("Analog Clock")
+WIDTH, HEIGHT = 1920, 1080
+center = (WIDTH / 2, HEIGHT / 2)
+clock_radius = 400
 
-        self.canvas = tk.Canvas(master, width=400, height=400, bg="white")
-        self.canvas.pack()
+pygame.init()
 
-        self.draw_clock_face()
-        self.draw_clock_hands()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Analog Clock")
+clock = pygame.time.Clock()
+FPS = 60
 
-        self.update_clock()
+CLOCK = (33, 35, 37)
+BACKGROUND = (217, 215, 211)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
-    def draw_clock_face(self):
-        center_x = 200
-        center_y = 200
-        radius = 180
 
-        # Clock circle
-        self.canvas.create_oval(center_x - radius, center_y - radius,
-                                center_x + radius, center_y + radius,
-                                width=2, outline="black")
+def numbers(number, size, position):
+    font = pygame.font.SysFont("Arial", size, True, False)
+    text = font.render(number, True, WHITE)
+    text_rect = text.get_rect(center=(position))
+    screen.blit(text, text_rect)
 
-        # Hour markers
-        for i in range(12):
-            angle = (i / 12) * 360
-            x = center_x + radius * 0.8 * math.cos(math.radians(angle))
-            y = center_y + radius * 0.8 * math.sin(math.radians(angle))
-            self.canvas.create_line(center_x, center_y, x, y, width=2)
 
-        # Minute markers
-        for i in range(60):
-            angle = (i / 60) * 360
-            x = center_x + radius * 0.9 * math.cos(math.radians(angle))
-            y = center_y + radius * 0.9 * math.sin(math.radians(angle))
-            if i % 5 == 0:
-                self.canvas.create_line(center_x, center_y, x, y, width=2)
+def polar_to_cartesian(r, theta):
+    x = r * sin(pi * theta / 180)
+    y = r * cos(pi * theta / 180)
+    return x + WIDTH / 2, -(y - HEIGHT / 2)
+
+
+def main():
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        current_time = datetime.datetime.now()
+        second = current_time.second
+        minute = current_time.minute
+        hour = current_time.hour
+
+        day = current_time.day
+        month = current_time.month
+        year = current_time.year
+        weekday = current_time.today().isoweekday()
+        calendar = current_time.today().isocalendar()
+
+        weekdays_abbr = {1: "Mo", 2: "Tu", 3: "We", 4: "Th", 5: "Fr", 6: "Sa", 7: "Su"}
+        weekday_abbr = weekdays_abbr.get(weekday)
+
+        months_abbr = {1: "JAN", 2: "FEB", 3: "MAR", 4: "APR", 5: "MAY", 6: "JUN", 7: "JUL",
+                       8: "AUG", 9: "SEP", 10: "OCT", 11: "NOV", 12: "DEC"}
+        month_abbr = months_abbr.get(month)
+
+        if day < 10:
+            day = "0" + str(day)
+
+        screen.fill(BLACK)
+        pygame.draw.circle(screen, WHITE, center, clock_radius - 10, 10)
+        pygame.draw.circle(screen, WHITE, center, 12)
+        pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 260, HEIGHT / 2 - 30, 80, 60], 1)
+        pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 180, HEIGHT / 2 - 30, 80, 60], 1)
+        pygame.draw.rect(screen, WHITE, [WIDTH / 2 + 100, HEIGHT / 2 - 30, 80, 60], 1)
+        pygame.draw.rect(screen, WHITE, [WIDTH / 2 + 180, HEIGHT / 2 - 30, 80, 60], 1)
+        pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 50, HEIGHT / 2 - 30 + 160, 100, 60], 1)
+
+        numbers(str(weekday_abbr), 40, (WIDTH / 2 - 220, HEIGHT / 2))
+        numbers(str(calendar[1]), 40, (WIDTH / 2 - 140, HEIGHT / 2))
+        numbers(str(month_abbr), 40, (WIDTH / 2 + 140, HEIGHT / 2))
+        numbers(str(day), 40, (WIDTH / 2 + 220, HEIGHT / 2))
+        numbers(str(year), 40, (WIDTH / 2, HEIGHT / 2 + 160))
+
+        for number in range(1, 13):
+            numbers(str(number), 80, polar_to_cartesian(clock_radius - 80, number * 30))
+
+        for number in range(0, 360, 6):
+            if number % 5:
+                pygame.draw.line(screen, WHITE, polar_to_cartesian(clock_radius - 15, number),
+                                 polar_to_cartesian(clock_radius - 30, number), 2)
             else:
-                self.canvas.create_line(center_x, center_y, x, y, width=1)
+                pygame.draw.line(screen, WHITE, polar_to_cartesian(clock_radius - 15, number),
+                                 polar_to_cartesian(clock_radius - 35, number), 6)
 
-    def draw_clock_hands(self):
-        self.hour_hand = self.canvas.create_line(200, 200, 200, 150, width=4, fill="black")
-        self.minute_hand = self.canvas.create_line(200, 200, 200, 100, width=3, fill="black")
-        self.second_hand = self.canvas.create_line(200, 200, 200, 50, width=2, fill="red")
+        # Hour
+        r = 250
+        theta = (hour + minute / 60 + second / 3600) * (360 / 12)
+        pygame.draw.line(screen, WHITE, center, polar_to_cartesian(r, theta), 14)
 
-    def update_clock(self):
-        current_time = time.localtime()
-        hour = current_time.tm_hour % 12
-        minute = current_time.tm_min
-        second = current_time.tm_sec
+        # Minute
+        r = 280
+        theta = (minute + second / 60) * (360 / 60)
+        pygame.draw.line(screen, WHITE, center, polar_to_cartesian(r, theta), 10)
 
-        hour_angle = (hour + minute / 60) * 30
-        minute_angle = (minute + second / 60) * 6
-        second_angle = second * 6
+        # Second
+        r = 340
+        theta = second * (360 / 60)
+        pygame.draw.line(screen, RED, center, polar_to_cartesian(r, theta), 4)
 
-        self.canvas.delete(self.hour_hand)
-        self.canvas.delete(self.minute_hand)
-        self.canvas.delete(self.second_hand)
+        pygame.display.update()
 
-        self.hour_hand = self.canvas.create_line(200, 200, 200 + 100 * math.cos(math.radians(hour_angle - 90)), 
-                                                200 + 100 * math.sin(math.radians(hour_angle - 90)), 
-                                                width=4, fill="black")
-        self.minute_hand = self.canvas.create_line(200, 200, 200 + 140 * math.cos(math.radians(minute_angle - 90)), 
-                                                200 + 140 * math.sin(math.radians(minute_angle - 90)), 
-                                                width=3, fill="black")
-        self.second_hand = self.canvas.create_line(200, 200, 200 + 160 * math.cos(math.radians(second_angle - 90)), 
-                                                200 + 160 * math.sin(math.radians(second_angle - 90)), 
-                                                width=2, fill="red")
+        clock.tick(FPS)
 
-        self.master.after(1000, self.update_clock)
+    pygame.quit()
 
-root = tk.Tk()
-clock = Clock(root)
-root.mainloop()
+
+main()

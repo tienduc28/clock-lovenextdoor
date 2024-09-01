@@ -16,18 +16,36 @@ FPS = 60
 
 CLOCK = (33, 35, 37)
 BACKGROUND = (217, 215, 211)
+RED = (255, 0, 0)
+YELLOW = (196, 166, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED = (255, 0, 0)
 
+fonts = pygame.font.get_fonts()
+print(fonts)
 
 def numbers(number, size, position):
-    font = pygame.font.SysFont("Arial", size, True, False)
-    text = font.render(number, True, WHITE)
+    font = pygame.font.Font("Dubai-Regular.ttf", size)
+    text = font.render(number, True, CLOCK)
     text_rect = text.get_rect(center=(position))
     screen.blit(text, text_rect)
 
+def write_text(text, size, position, font_file, text_rotate_degrees=0, align="center"):
+    font = pygame.font.Font(font_file, size)
+    text_surface = font.render(text, True, CLOCK)
+    
+    if text_rotate_degrees != 0:
+        text_surface = pygame.transform.rotate(text_surface, text_rotate_degrees)
+    
+    text_rect = text_surface.get_rect()
 
+    if align == "right":
+        text_rect.topright = position
+    elif align == "left":
+        text_rect.topleft = position
+    else:
+        text_rect.center = position
+    screen.blit(text_surface, text_rect)
 def polar_to_cartesian(r, theta):
     x = r * sin(pi * theta / 180)
     y = r * cos(pi * theta / 180)
@@ -63,45 +81,68 @@ def main():
         if day < 10:
             day = "0" + str(day)
 
-        screen.fill(BLACK)
-        pygame.draw.circle(screen, WHITE, center, clock_radius - 10, 10)
-        pygame.draw.circle(screen, WHITE, center, 12)
-        pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 260, HEIGHT / 2 - 30, 80, 60], 1)
-        pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 180, HEIGHT / 2 - 30, 80, 60], 1)
-        pygame.draw.rect(screen, WHITE, [WIDTH / 2 + 100, HEIGHT / 2 - 30, 80, 60], 1)
-        pygame.draw.rect(screen, WHITE, [WIDTH / 2 + 180, HEIGHT / 2 - 30, 80, 60], 1)
-        pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 50, HEIGHT / 2 - 30 + 160, 100, 60], 1)
+        screen.fill(BACKGROUND)
 
-        numbers(str(weekday_abbr), 40, (WIDTH / 2 - 220, HEIGHT / 2))
-        numbers(str(calendar[1]), 40, (WIDTH / 2 - 140, HEIGHT / 2))
-        numbers(str(month_abbr), 40, (WIDTH / 2 + 140, HEIGHT / 2))
-        numbers(str(day), 40, (WIDTH / 2 + 220, HEIGHT / 2))
-        numbers(str(year), 40, (WIDTH / 2, HEIGHT / 2 + 160))
+        #CIRCLES
+        
+        pygame.draw.circle(screen, CLOCK, center, clock_radius - 10, 5)
 
-        for number in range(1, 13):
-            numbers(str(number), 80, polar_to_cartesian(clock_radius - 80, number * 30))
+        outer_radius = clock_radius - 2
+        pygame.draw.circle(screen, CLOCK, center, outer_radius, 2)
+        gfxdraw.aacircle(screen, int(center[0]), int(center[1]), outer_radius + 1, CLOCK)
+        gfxdraw.aacircle(screen, int(center[0]), int(center[1]), outer_radius, CLOCK)
+        gfxdraw.aacircle(screen, int(center[0]), int(center[1]), outer_radius - 1, CLOCK)
+        # pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 260, HEIGHT / 2 - 30, 80, 60], 1)
+        # pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 180, HEIGHT / 2 - 30, 80, 60], 1)
+        # pygame.draw.rect(screen, WHITE, [WIDTH / 2 + 100, HEIGHT / 2 - 30, 80, 60], 1)
+        # pygame.draw.rect(screen, WHITE, [WIDTH / 2 + 180, HEIGHT / 2 - 30, 80, 60], 1)
+        # pygame.draw.rect(screen, WHITE, [WIDTH / 2 - 50, HEIGHT / 2 - 30 + 160, 100, 60], 1)
 
-        for number in range(0, 360, 6):
-            if number % 5:
-                pygame.draw.line(screen, WHITE, polar_to_cartesian(clock_radius - 15, number),
-                                 polar_to_cartesian(clock_radius - 30, number), 2)
-            else:
-                pygame.draw.line(screen, WHITE, polar_to_cartesian(clock_radius - 15, number),
-                                 polar_to_cartesian(clock_radius - 35, number), 6)
+        # numbers(str(weekday_abbr), 40, (WIDTH / 2 - 220, HEIGHT / 2))
+        # numbers(str(calendar[1]), 40, (WIDTH / 2 - 140, HEIGHT / 2))
+        # numbers(str(month_abbr), 40, (WIDTH / 2 + 140, HEIGHT / 2))
+        # numbers(str(day), 40, (WIDTH / 2 + 220, HEIGHT / 2))
+        # numbers(str(year), 40, (WIDTH / 2, HEIGHT / 2 + 160))
 
+        for number in range(1, 25):
+            numbers(str(number), 40, polar_to_cartesian(clock_radius + 30, number * 15))
+
+        for number in range(0, 360, 15):
+            width = 3
+            if (number % 90 == 0):
+                width = 6
+            pygame.draw.line(screen, CLOCK, polar_to_cartesian(clock_radius + 8, number), polar_to_cartesian(clock_radius - 22, number), width)
+
+        # draw dividing lines
+        rb = 15
+        thetas = [5*rb, 6*rb, 9*rb, 12*rb-6, 12*rb+6, 15*rb, 19*rb, 20*rb, 21*rb, 22*rb]
+        for theta in thetas:
+            pygame.draw.line(screen, CLOCK, polar_to_cartesian(clock_radius - 30, theta), polar_to_cartesian(clock_radius - 335, theta), 2)
+
+        write_text("Ngủ", 50, (WIDTH / 2 + 100, HEIGHT / 2 - 150), "Dubai-Regular.ttf")
+        write_text("Dậy", 40, (WIDTH / 2 + 350, HEIGHT / 2 - 60), "Dubai-Regular.ttf", 8, 'right')
+        write_text("Ăn sáng", 40, (WIDTH / 2 + 330, HEIGHT / 2 + 60), "Dubai-Regular.ttf", 360 - 22, 'right')
+        write_text("Chơi game", 40, (WIDTH / 2 + 160, HEIGHT / 2 + 155), "Dubai-Regular.ttf", 360 - 45, 'right')
+        write_text("Ăn trưa", 40, (WIDTH / 2 + 22, HEIGHT / 2 + 225), "Dubai-Regular.ttf", 360 - 90, 'right')
+        write_text("Xem TV", 40, (WIDTH / 2 - 165, HEIGHT / 2 + 133), "Dubai-Regular.ttf", 65, 'left')
+        write_text("Hẹn hò", 40, (WIDTH / 2 - 330, HEIGHT / 2 + 75), "Dubai-Regular.ttf", 20, 'left')
+        write_text("Code", 40, (WIDTH / 2 - 340, HEIGHT / 2 - 100), "Dubai-Regular.ttf", 360 - 15, 'left')
+        write_text("Xem phim", 40, (WIDTH / 2 - 295, HEIGHT / 2 - 225), "Dubai-Regular.ttf", 360 - 35, 'left')
+        write_text("Skin care", 40, (WIDTH / 2 - 235, HEIGHT / 2 - 280), "Dubai-Regular.ttf", 360 - 50, 'left')
         # Hour
-        r = 250
+        r = 130
         theta = (hour + minute / 60 + second / 3600) * (360 / 12)
-        pygame.draw.line(screen, WHITE, center, polar_to_cartesian(r, theta), 14)
+        pygame.draw.line(screen, CLOCK, center, polar_to_cartesian(r, theta), 14)
 
         # Minute
         r = 280
         theta = (minute + second / 60) * (360 / 60)
-        pygame.draw.line(screen, WHITE, center, polar_to_cartesian(r, theta), 10)
+        pygame.draw.line(screen, CLOCK, center, polar_to_cartesian(r, theta), 10)
 
         # Second
         r = 340
         theta = second * (360 / 60)
+        pygame.draw.line(screen, RED, center, polar_to_cartesian(r, theta), 4)
         pygame.draw.line(screen, RED, center, polar_to_cartesian(r, theta), 4)
 
         pygame.display.update()

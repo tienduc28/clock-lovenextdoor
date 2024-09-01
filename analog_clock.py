@@ -21,8 +21,8 @@ YELLOW = (196, 166, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-fonts = pygame.font.get_fonts()
-print(fonts)
+# fonts = pygame.font.get_fonts()
+# print(fonts)
 
 def numbers(number, size, position):
     font = pygame.font.Font("Dubai-Regular.ttf", size)

@@ -5,7 +5,7 @@ from pygame import gfxdraw
 
 WIDTH, HEIGHT = 1920, 1080
 center = (WIDTH / 2, HEIGHT / 2)
-clock_radius = 400
+clock_radius = 350
 
 pygame.init()
 
@@ -19,8 +19,8 @@ BACKGROUND = (217,215,211)
 RED = (255, 0, 0)
 YELLOW = (196,166,0)
 
-fonts = pygame.font.get_fonts()
-print(fonts)
+# fonts = pygame.font.get_fonts()
+# print(fonts)
 
 
 def numbers(number, size, position):
@@ -52,6 +52,24 @@ def polar_to_cartesian(r, theta):
     y = r * cos(pi * theta / 180)
     return x + WIDTH / 2, -(y - HEIGHT / 2)
 
+# Load image
+image = pygame.image.load('moonandcloud.png')
+
+# Define position for the image
+image_position = (880, 220)  # You can change the position as needed
+resized_image = pygame.transform.scale(image, (320, 200))
+
+# Định nghĩa font chữ và kích thước
+font = pygame.font.Font(None, 50)  # Sử dụng font mặc định, kích thước 74
+
+# Tạo đối tượng Surface cho chữ
+text = font.render('TIME TABLE', (255, 255, 255), (0, 0, 0))
+
+# Lấy kích thước của chữ (chiều rộng và chiều cao)
+text_rect = text.get_rect()
+
+# Căn lề giữa theo cả trục x và trục y
+text_rect.center = (1920 // 2, 130)
 
 def main():
     run = True
@@ -62,6 +80,9 @@ def main():
                 run = False
 
         screen.fill(BACKGROUND)
+        screen.blit(resized_image, image_position)
+        # Vẽ chữ đã căn giữa lên màn hình
+        screen.blit(text, text_rect)
 
         # draw circles
         pygame.draw.circle(screen, CLOCK, center, clock_radius - 10, 5)
@@ -92,16 +113,16 @@ def main():
             pygame.draw.line(screen, CLOCK, polar_to_cartesian(clock_radius - 30, theta), polar_to_cartesian(clock_radius - 335, theta), 2)
 
 
-        write_text(u"꿈나라", 56, (WIDTH / 2 + 100, HEIGHT / 2 - 150), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf")
-        write_text(u"아침", 40, (WIDTH / 2 + 350, HEIGHT / 2 - 60), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 8, 'right')
-        write_text(u"게임하기", 40, (WIDTH / 2 + 330, HEIGHT / 2 + 60), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 360-23, 'right')
-        write_text(u"멍때리기", 40, (WIDTH / 2 + 160, HEIGHT / 2 + 195), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 360-65, 'right')
-        write_text(u"점심", 40, (WIDTH / 2 + 22, HEIGHT / 2 + 285), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 360-90, 'right')
-        write_text(u"TV보기", 40, (WIDTH / 2 - 80, HEIGHT / 2 + 215), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 65, 'right')
-        write_text(u"낮잠자기", 40, (WIDTH / 2 - 200, HEIGHT / 2 + 60), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 20, 'right')
-        write_text(u"만화방 가기", 40, (WIDTH / 2 - 170, HEIGHT / 2 - 105), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 360-15, 'right')
-        write_text(u"자유시간", 40, (WIDTH / 2 - 165, HEIGHT / 2 - 225), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 360-37, 'right')
-        write_text(u"고려", 40, (WIDTH / 2 - 163, HEIGHT / 2 - 290), "./1HoonSaemaulundong/HoonSaemaulundong Regular.ttf", 360-53, 'right')
+        write_text(u"SLEEP", 56, (WIDTH / 2 + 100, HEIGHT / 2 - 150), "./calibri-regular.ttf")
+        write_text(u"BREAKFAST", 30, (WIDTH / 2 + 250, HEIGHT / 2 - 30), "./calibri-regular.ttf", 8)
+        write_text(u"PLAYING VIDEO GAME", 20, (WIDTH / 2 + 300, HEIGHT / 2 + 60), "./calibri-regular.ttf", 360-23, 'right')
+        write_text(u"FREE TIME", 30, (WIDTH / 2 + 140, HEIGHT / 2 + 165), "./calibri-regular.ttf", 360-65, 'right')
+        write_text(u"LUNCH", 30, (WIDTH / 2 + 18, HEIGHT / 2 + 235), "./calibri-regular.ttf", 360-90, 'right')
+        write_text(u"WATCHING TV", 30, (WIDTH / 2 - 45, HEIGHT / 2 + 125), "./calibri-regular.ttf", 65, 'right')
+        write_text(u"TAKE A NAP", 30, (WIDTH / 2 - 130, HEIGHT / 2 + 60), "./calibri-regular.ttf", 20, 'right')
+        write_text(u"DATING", 30, (WIDTH / 2 - 170, HEIGHT / 2 - 90), "./calibri-regular.ttf", 360-15, 'right')
+        write_text(u"FREE TIME", 30, (WIDTH / 2 - 135, HEIGHT / 2 - 195), "./calibri-regular.ttf", 360-37, 'right')
+        write_text(u"STH", 30, (WIDTH / 2 - 145, HEIGHT / 2 - 260), "./calibri-regular.ttf", 360-53, 'right')
 
         current_time = datetime.datetime.now()
         second = current_time.second
@@ -125,9 +146,9 @@ def main():
 
 
         # play button
-        gfxdraw.filled_circle(screen, int(center[0]), int(center[1]), clock_radius - 350, YELLOW)
+        gfxdraw.filled_circle(screen, int(center[0]), int(center[1]), clock_radius - 320, YELLOW)
         pygame.draw.circle(screen, CLOCK, center, clock_radius - 350 - 1, 2)
-        write_text("PLAY", 46, (WIDTH/2, HEIGHT/2 + 3), "calibri-font-family\calibri-bold.ttf")
+        write_text("PLAY", 24, (WIDTH/2, HEIGHT/2 + 3), "calibri-font-family\calibri-bold.ttf")
 
         pygame.display.update()
 
